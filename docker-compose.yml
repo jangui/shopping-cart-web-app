@@ -1,0 +1,83 @@
+version: '3.7'
+
+services:
+  traefik:
+    image: traefik:v2.2
+    command:
+      # enable web ui
+      - "--api.insecure=true"
+      # set provider to docker
+      - "--providers.docker=true"
+      #only expose containers with 'traefik.enable=true' label
+      - "--providers.docker.exposedbydefault=false"
+      # set entrypoints
+      - "--entryPoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      # redirect http to https
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      - "--entrypoints.web.http.redirections.entryPoint.permanent=true"
+      # ACME (Let's Encrypt) auto SSL
+      - "--certificatesResolvers.leresolver.acme.email=${ACME_EMAIL}"
+      - "--certificatesResolvers.leresolver.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesResolvers.leresolver.acme.tlsChallenge=true"
+      - "--certificatesResolvers.leresolver.acme.httpChallenge=true"
+      - "--certificatesResolvers.leresolver.acme.httpChallenge.entryPoint=web"
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - traefik-proxy
+    volumes:
+      # allow traefik to listen on docker socket
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      # Lets Encrypt
+      - "./data/letsencrypt/acme.json:/letsencrypt/acme.json"
+    labels:
+      # Redirect all HTTP to HTTPS permanently
+      - "traefik.http.routers.http_catchall.rule=HostRegexp(`{any:.+}`)"
+      - "traefik.http.routers.http_catchall.entrypoints=web"
+      - "traefik.http.routers.http_catchall.middlewares=https_redirect"
+      - "traefik.http.middlewares.https_redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.https_redirect.redirectscheme.permanent=true"
+
+  db:
+    image: mongo
+    restart: always
+    networks:
+      - traefik-proxy
+    ports:
+      - "27017:27017"
+    volumes:
+      - "./data/db:/data/db"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    labels:
+      - "traefik.enable=false"
+
+  api:
+    build: api
+    restart: always
+    networks:
+      - traefik-proxy
+    volumes:
+      - "./api:/app"
+      - "/app/node_modules"
+    labels:
+        # enable traefik auto discovery
+      - "traefik.enable=true"
+        # entry point for router
+      - "traefik.http.routers.api.entrypoints=websecure"
+        # rule which router will route requests from
+      - "traefik.http.routers.api.rule=Host(`api.${DOMAIN}`)"
+        # enable tls for router
+      - "traefik.http.routers.api.tls=true"
+        # specify cert resolver for router
+      - "traefik.http.routers.api.tls.certresolver=leresolver"
+        # tell service which port (in container) to route trafic to
+      - "traefik.http.services.api.loadbalancer.server.port=5000"
+
+networks:
+    traefik-proxy:
