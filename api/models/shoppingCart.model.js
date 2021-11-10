@@ -10,13 +10,10 @@ const shoppingCartSchema = new Schema({
     unique: true,
     minlength: 1,
   },
-  category: {
-    type: String,
-    default: "",
-    trim: true,
+  quantity: {
+    type: Number,
+    default: 1,
   },
-}, {
-  timestamps: true,
 });
 
 const ShoppingCart = mongoose.model('ShoppingCart', shoppingCartSchema);

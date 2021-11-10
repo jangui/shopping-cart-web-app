@@ -23,6 +23,9 @@ connection.once('open', () => {
 const cartRouter = require('./routes/cart');
 app.use('/cart', cartRouter);
 
+const catelogueRouter = require('./routes/catelogue');
+app.use('/catelogue', catelogueRouter);
+
 
 // start app
 app.listen(port, () => {
