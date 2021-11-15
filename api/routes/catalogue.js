@@ -1,10 +1,10 @@
 const router = require('express').Router();
-let Catelogue = require('../models/catelogue.model');
+let Catalogue = require('../models/catalogue.model');
 
 // get all items
 router.route('/').get( async (req, res) => {
   try {
-    let items = await Catelogue.find();
+    let items = await Catalogue.find();
     return res.json(items)
   } catch(err) {
     return res.status(400).json('Error: ' + err);
@@ -14,7 +14,7 @@ router.route('/').get( async (req, res) => {
 // get total item count
 router.route('/total').get( async (req, res) => {
   try {
-    let count = await Catelogue.countDocuments();
+    let count = await Catalogue.countDocuments();
     return res.json(count)
   } catch(err) {
     return res.status(400).json('Error: ' + err);
@@ -24,9 +24,9 @@ router.route('/total').get( async (req, res) => {
 // add item
 router.route('/add').post( async (req, res) => {
   const name = req.body.name;
-  const category = req.body.category;
+  const catagory = req.body.catagory;
 
-  const newItem = new Catelogue({name, category});
+  const newItem = new Catalogue({name, catagory});
 
   try {
     let response = await newItem.save();
@@ -40,7 +40,7 @@ router.route('/add').post( async (req, res) => {
 // delete item by id
 router.route('/:id').delete( async (req, res) => {
   try {
-    await Catelogue.findByIdAndDelete(req.params.id);
+    await Catalogue.findByIdAndDelete(req.params.id);
     return res.json("post deleted")
   } catch(err) {
     return res.status(400).json('Error: ' + err);
@@ -50,7 +50,7 @@ router.route('/:id').delete( async (req, res) => {
 // update item
 router.route('/update/:id').post( async (req, res) => {
   try {
-    let itemDoc = await Catelogue.findById(req.params.id);
+    let itemDoc = await Catalogue.findById(req.params.id);
     itemDoc.name = req.body.name;
     itemDoc.category = req.body.category;
 

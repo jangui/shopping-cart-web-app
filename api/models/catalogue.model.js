@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const catelogueSchema = new Schema({
+const catalogueSchema = new Schema({
   name: {
     type: String,
     required: true,
@@ -17,6 +17,6 @@ const catelogueSchema = new Schema({
   },
 });
 
-const Catelogue = mongoose.model('Catelogue', catelogueSchema);
+const Catalogue = mongoose.model('Catalogue', catalogueSchema);
 
-module.exports = Catelogue;
+module.exports = Catalogue;

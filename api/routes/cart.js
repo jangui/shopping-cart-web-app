@@ -24,7 +24,17 @@ router.route('/total').get( async (req, res) => {
 // add item
 router.route('/add').post( async (req, res) => {
   const name = req.body.name;
-  const quantity = parseInt(req.body.quantity);
+
+  // handle int parsing
+  let quantity = req.body.quantity;
+  if (isNaN(parseFloat(quantity))) {
+    // error
+    return res.status(400).json('Error: Quantity provided is not an integer');
+  } else if (isFinite(quantity)) {
+    // parse Int if number recieved
+    quantity = parseInt(quantity);
+  }
+
 
   const newItem = new Cart({name, quantity});
 

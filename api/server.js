@@ -23,8 +23,8 @@ connection.once('open', () => {
 const cartRouter = require('./routes/cart');
 app.use('/cart', cartRouter);
 
-const catelogueRouter = require('./routes/catelogue');
-app.use('/catelogue', catelogueRouter);
+const catalogueRouter = require('./routes/catalogue');
+app.use('/catalogue', catalogueRouter);
 
 
 // start app
