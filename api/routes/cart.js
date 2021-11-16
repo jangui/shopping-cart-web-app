@@ -21,6 +21,16 @@ router.route('/total').get( async (req, res) => {
   }
 });
 
+// find post by id
+router.route('/:id').get( async (req, res) => {
+  try {
+    let item = await Cart.findById(req.params.id);
+    return res.json(item)
+  } catch(err) {
+    return res.status(400).json('Error: ' + err);
+  }
+});
+
 // add item
 router.route('/add').post( async (req, res) => {
   const name = req.body.name;
@@ -40,7 +50,8 @@ router.route('/add').post( async (req, res) => {
 
   try {
     let response = await newItem.save();
-    return res.json(`Item '${name}' added!`);
+    let msg = `Item '${name}' added!`;
+    return res.json({'response': msg, 'id': response._id});
   } catch(err) {
     return res.status(400).json('Error: ' + err);
   }

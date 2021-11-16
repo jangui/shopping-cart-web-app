@@ -1,0 +1,22 @@
+
+.CartItem {
+  display: flex;
+  width: 40%;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.CartItemLeft {
+  display: flex;
+  flex-direction: row;
+}
+
+.CartItemRight {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.CartItem-button {
+  background-color: #bbccff;
+}
