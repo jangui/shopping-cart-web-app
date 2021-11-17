@@ -7,7 +7,8 @@ router.route('/').get( async (req, res) => {
     let items = await Catalogue.find();
     return res.json(items)
   } catch(err) {
-    return res.status(400).json('Error: ' + err);
+    err.msg = "Error getting all items in catalogue";
+    return res.status(400).json({error: err});
   }
 });
 
@@ -17,22 +18,24 @@ router.route('/total').get( async (req, res) => {
     let count = await Catalogue.countDocuments();
     return res.json(count)
   } catch(err) {
-    return res.status(400).json('Error: ' + err);
+    err.msg = "Error getting total item count in catalogue";
+    return res.status(400).json({error: err});
   }
 });
 
 // add item
 router.route('/add').post( async (req, res) => {
   const name = req.body.name;
-  const catagory = req.body.catagory;
+  const category = req.body.category;
 
-  const newItem = new Catalogue({name, catagory});
+  const newItem = new Catalogue({name, category});
 
   try {
     let response = await newItem.save();
     return res.json(`Item '${name}' added!`);
   } catch(err) {
-    return res.status(400).json('Error: ' + err);
+    err.msg = `Error adding ${name}`;
+    return res.status(400).json({error: err});
   }
 });
 
@@ -43,7 +46,8 @@ router.route('/:id').delete( async (req, res) => {
     await Catalogue.findByIdAndDelete(req.params.id);
     return res.json("post deleted")
   } catch(err) {
-    return res.status(400).json('Error: ' + err);
+    err.msg = `Error deleting ${req.params.id}`;
+    return res.status(400).json({error: err});
   }
 });
 
@@ -58,10 +62,12 @@ router.route('/update/:id').post( async (req, res) => {
       let response = await itemDoc.save();
       return res.json(`Item '${itemDoc.name}' updated!`);
     } catch(err) {
-      return res.status(400).json('Error: ' + err);
+      err.msg  = `Error updating ${itemDoc.name}`;
+      return res.status(400).json({error: err});
     }
   } catch(err) {
-    return res.status(400).json('Error: ' + err);
+      err.msg  = `Error finding ${req.params.id}`;
+      return res.status(400).json({error: err});
   }
 });
 

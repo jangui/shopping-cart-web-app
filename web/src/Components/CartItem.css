@@ -1,7 +1,7 @@
 
 .CartItem {
   display: flex;
-  width: 40%;
+  width: clamp(200px, 40%, 800px);
   flex-direction: row;
   justify-content: space-between;
 }

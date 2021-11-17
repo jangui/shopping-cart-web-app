@@ -7,30 +7,54 @@ const apiEndpoint = "https://api.jaime.link/cart/";
 class CartItem extends Component {
     constructor(props) {
         super(props);
+
+        this.state = {
+            error: "",
+        };
     }
 
-    delete = async () => {
+    /*
+     * Deletes this item from backend & frontend
+     * Calls parent function for deletion from frontend
+     */
+    delItem = async () => {
+        // delete fron backend
+        let res = this.delItemBackend();
+        if ('error' in res) {
+            this.setState({error: res['error']});
+            console.log(`Error: ${res['error']}`)
+            return;
+        }
+
+        // delete from frontend
+        this.props.del(this.props.index);
+    }
+
+    /*
+     * Deletes this item from backend
+     * @return {JSON} The json response from the API
+     *                Only error the response will contain an 'error' field
+     */
+    delItemBackend = async () => {
+        let response;
         try {
-            // delete from backend
             let url = `${apiEndpoint}${this.props.id}/`;
-            const response = await fetch(url, {
+            response = await fetch(url, {
                 method: 'DELETE',
                 headers: {
                     'Content-type': 'application/json',
                 }
             });
-
             let data = await response.json();
-
-            // delete from frontend
-            this.props.del(this.props.index);
+            return data;
         } catch (err) {
-            // TODO error handling
-            console.log(err);
+            response = new Response();
+            return response.json({error: err});
         }
     }
 
     render() {
+        // TODO if error render popup error
         return (
             <div className="CartItem">
                 <div className="CartItemLeft">
@@ -38,7 +62,7 @@ class CartItem extends Component {
                 </div>
 
                 <div className="CartItemRight">
-                    <button type="button" onClick={() => this.delete()}> Delete </button>
+                    <button type="button" onClick={() => this.delItem()}> Delete </button>
                 </div>
             </div>
         );
